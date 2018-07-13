@@ -46,13 +46,14 @@ public final class ThreadUtil {
      * 获取当前进程名
      */
     @Nullable
-    public static String getCurrProgressName(Context context){
+    public static String getCurrProgressName(Context context) {
         ActivityManager activityManager = (ActivityManager) context.getSystemService(Context.ACTIVITY_SERVICE);
         for (ActivityManager.RunningAppProcessInfo processInfo : activityManager.getRunningAppProcesses()) {
-            if (processInfo.pid == android.os.Process.myPid()){
+            if (processInfo.pid == android.os.Process.myPid()) {
                 return processInfo.processName;
             }
         }
         return null;
     }
+
 }

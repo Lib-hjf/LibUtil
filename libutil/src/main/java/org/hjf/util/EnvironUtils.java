@@ -33,7 +33,7 @@ public final class EnvironUtils {
 	/**
 	 * 获取应用版本名字
 	 */
-	public static String getVersionName(Context context) {
+	public static String getAppVersionName(Context context) {
 		try {
 			PackageInfo pInfo = context.getPackageManager().getPackageInfo(context.getPackageName(), PackageManager.GET_CONFIGURATIONS);
 			return pInfo.versionName;
@@ -46,7 +46,7 @@ public final class EnvironUtils {
 	/**
 	 * 获取应用版本号
 	 */
-	public static int getVersionCode(Context context) {
+	public static int getAppVersionCode(Context context) {
 		try {
 			PackageInfo pInfo = context.getPackageManager().getPackageInfo(context.getPackageName(), PackageManager.GET_CONFIGURATIONS);
 			return pInfo.versionCode;
@@ -72,6 +72,20 @@ public final class EnvironUtils {
 		return "";
 	}
 
+
+	/**
+	 * 获取应用名
+	 */
+	public static String getApplicationID(Context context) {
+		try {
+			PackageManager packageManager = context.getPackageManager();
+			PackageInfo packageInfo = packageManager.getPackageInfo(context.getPackageName(), 0);
+			return packageInfo.applicationInfo.packageName;
+		} catch (NameNotFoundException e) {
+			e.printStackTrace();
+		}
+		return "";
+	}
 
 
 	/*############################################
@@ -144,24 +158,6 @@ public final class EnvironUtils {
 	public static boolean isSdAvailable() {
 		String state = Environment.getExternalStorageState();
 		return Environment.MEDIA_MOUNTED.equals(state);
-	}
-
-	/**
-	 * 返回手机的唯一标识
-	 */
-	public static String getPhoneID(Context context, String phone_num) {
-		String id = getMacAddress(context);
-		if(TextUtils.isEmpty(id)) {
-			id = getIMEI(context);
-		}
-		if(TextUtils.isEmpty(id) && !TextUtils.isEmpty(phone_num)) {
-			id = phone_num + System.currentTimeMillis();
-		}
-
-		if(!TextUtils.isEmpty(id)) {
-			id = id.toLowerCase();
-		}
-		return id;
 	}
 
 	/**
