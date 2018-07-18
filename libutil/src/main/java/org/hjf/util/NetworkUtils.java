@@ -8,11 +8,6 @@ import android.net.wifi.WifiInfo;
 import android.net.wifi.WifiManager;
 import android.text.TextUtils;
 
-import java.net.InetAddress;
-import java.net.NetworkInterface;
-import java.net.SocketException;
-import java.util.Enumeration;
-
 /**
  * 网络相关工具类
  */
@@ -26,8 +21,7 @@ public class NetworkUtils {
 
     public static int getNetWorkType(Context context) {
         // 获取系统的连接服务
-        ConnectivityManager connectivityManager = (ConnectivityManager) context
-                .getSystemService(Context.CONNECTIVITY_SERVICE);
+        ConnectivityManager connectivityManager = (ConnectivityManager) context.getSystemService(Context.CONNECTIVITY_SERVICE);
 
         // 获取网络的连接情况
         NetworkInfo networkInfo = connectivityManager.getActiveNetworkInfo();
@@ -52,11 +46,6 @@ public class NetworkUtils {
         } else {
             return TYPE_WAP;
         }
-    }
-
-    // TODO
-    public static String getIpAddress(Context context) {
-        return "";
     }
 
     public static boolean isWIFI(Context context) {
@@ -92,8 +81,7 @@ public class NetworkUtils {
     }
 
     public static boolean isNetworkAvailable(Context paramContext) {
-        ConnectivityManager localConnectivityManager = (ConnectivityManager) paramContext
-                .getSystemService("connectivity");
+        ConnectivityManager localConnectivityManager = (ConnectivityManager) paramContext.getSystemService("connectivity");
         if (localConnectivityManager == null) {
             return false;
         }
@@ -106,8 +94,7 @@ public class NetworkUtils {
 
         for (int i = 0; i < arrayOfNetworkInfo.length; i++) {
 
-            if ((!arrayOfNetworkInfo[i].isAvailable())
-                    || (!arrayOfNetworkInfo[i].isConnected()))
+            if ((!arrayOfNetworkInfo[i].isAvailable()) || (!arrayOfNetworkInfo[i].isConnected()))
                 continue;
 
             return true;
