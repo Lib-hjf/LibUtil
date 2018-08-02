@@ -1,4 +1,4 @@
-package org.hjf.util.log;
+package org.hjf.log;
 
 import java.io.BufferedWriter;
 import java.io.File;
@@ -51,8 +51,7 @@ class FileWriterTask implements Runnable {
                 if (writer != null) {
                     writer.close();
                 }
-            } catch (IOException e) {
-                e.printStackTrace();
+            } catch (IOException ignored) {
             }
         }
     }

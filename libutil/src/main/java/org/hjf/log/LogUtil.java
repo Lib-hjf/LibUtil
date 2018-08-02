@@ -1,4 +1,4 @@
-package org.hjf.util.log;
+package org.hjf.log;
 
 import android.support.annotation.Nullable;
 import android.text.TextUtils;

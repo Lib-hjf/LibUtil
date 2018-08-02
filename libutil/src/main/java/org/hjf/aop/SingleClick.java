@@ -1,4 +1,4 @@
-package org.hjf.util.aop;
+package org.hjf.aop;
 
 import java.lang.annotation.ElementType;
 import java.lang.annotation.Retention;
@@ -6,9 +6,9 @@ import java.lang.annotation.RetentionPolicy;
 import java.lang.annotation.Target;
 
 /**
- * 防止View多次点击
- * 表明被注释的方法将被跟踪（仅在Debug模式下）并且将会与Aspect程序中截获该注释的Advise关联，调用该切点
- * 的Advise
+ * View 点击防抖
+ * Class 文件有效
+ * RetentionPolicy: 注解声明周期 SOURCE CLASS RUNTIME
  */
 @Retention(RetentionPolicy.CLASS)
 @Target(ElementType.METHOD)

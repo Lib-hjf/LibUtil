@@ -1,4 +1,4 @@
-package org.hjf.util.log;
+package org.hjf.log;
 
 import java.util.concurrent.BlockingQueue;
 import java.util.concurrent.Executors;
