@@ -1,0 +1,4 @@
+<resources>
+    <integer name="handler_message_submit_db_log">10001</integer>
+    <integer name="handler_message_submit_file_log">10002</integer>
+</resources>

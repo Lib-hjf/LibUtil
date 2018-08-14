@@ -6,6 +6,7 @@ import android.widget.Toast;
 
 import org.hjf.util.DateUtils;
 import org.hjf.util.EnvironUtils;
+import org.hjf.util.FileWriterTask;
 
 import java.io.PrintWriter;
 import java.io.StringWriter;
@@ -18,25 +19,14 @@ import java.util.concurrent.TimeUnit;
  *
  * @author huangjf
  */
-final class CrashLog implements Thread.UncaughtExceptionHandler {
-
-    private static CrashLog crashLog;
+final class CrashLogger implements Thread.UncaughtExceptionHandler {
 
     private boolean isOpenCrashCatch = false;
     private Thread.UncaughtExceptionHandler systemDefaultHandler;
+    private String mCrashLogPath;
 
-    private CrashLog() {
-    }
-
-    static CrashLog getInstance() {
-        if (CrashLog.crashLog == null) {
-            synchronized (CrashLog.class) {
-                if (CrashLog.crashLog == null) {
-                    CrashLog.crashLog = new CrashLog();
-                }
-            }
-        }
-        return CrashLog.crashLog;
+    CrashLogger(String crashLogPath) {
+        this.mCrashLogPath = crashLogPath;
     }
 
     void open() {
@@ -107,7 +97,7 @@ final class CrashLog implements Thread.UncaughtExceptionHandler {
             @Override
             public void run() {
                 Looper.prepare();
-                Toast.makeText(LogMgr.getInstance().getContext(), "很抱歉，程序出现异常，即将退出。", Toast.LENGTH_LONG).show();
+                Toast.makeText(LogUtil.context, "很抱歉，程序出现异常，即将退出。", Toast.LENGTH_LONG).show();
                 Looper.loop();
             }
         }.start();
@@ -122,7 +112,7 @@ final class CrashLog implements Thread.UncaughtExceptionHandler {
             return false;
         }
         // 1. 获取运行环境信息：硬件、OS、软件
-        StringBuilder stringBuilder = getSystemInfo(LogMgr.getInstance().getContext());
+        StringBuilder stringBuilder = getSystemInfo(LogUtil.context);
 
         // 2. 收集异常信息
         PrintWriter printWriter = null;
@@ -152,8 +142,8 @@ final class CrashLog implements Thread.UncaughtExceptionHandler {
         stringBuilder.append("#end");
 
         // 3. 开启线程去写入到本地磁盘
-        String fileName = DateUtils.getDate_YMD_HMS(LogMgr.getInstance().getContext(), System.currentTimeMillis()) + ".txt";
-        String filePath = LogMgr.getInstance().getCrashLogPath() + fileName;
+        String fileName = DateUtils.getDate_YMD_HMS(LogUtil.context, System.currentTimeMillis()) + ".txt";
+        String filePath = this.mCrashLogPath + fileName;
 
         LogUtil.e("组成完毕参数，提交线程去执行任务");
         FileWriterTask fileWriterTask = new FileWriterTask(filePath, stringBuilder.toString());
@@ -170,7 +160,7 @@ final class CrashLog implements Thread.UncaughtExceptionHandler {
     private static StringBuilder getSystemInfo(Context context) {
         StringBuilder buffer = new StringBuilder();
         buffer.append("\n");
-        buffer.append("#-------system info-------");
+        buffer.append("#-------system content-------");
         buffer.append("\n");
         buffer.append("version-name:");
         buffer.append(EnvironUtils.getAppVersionName(context));

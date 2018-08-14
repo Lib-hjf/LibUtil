@@ -1,0 +1,8 @@
+<resources>
+    <!-- log level color -->
+    <color name="log_level_error">#ef4926</color>
+    <color name="log_level_warn">#ffc773</color>
+    <color name="log_level_info">#97ec71</color>
+    <color name="log_level_debug">#FFFFFF</color>
+    <color name="log_level_verbose">#FFFFFF</color>
+</resources>

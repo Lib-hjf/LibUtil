@@ -10,9 +10,8 @@ import java.util.concurrent.TimeUnit;
 
 /**
  * 按顺序一个一个执行任务的线程池，用于执行依赖顺序正确执行的【调试】任务。
- * 1. LogCat 日志输入到磁盘
  */
-class LogThreadPoolExecutor extends ThreadPoolExecutor {
+final class LogThreadPoolExecutor extends ThreadPoolExecutor {
 
     private static LogThreadPoolExecutor fifoPoolExecutor;
 

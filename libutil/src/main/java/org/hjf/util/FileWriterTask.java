@@ -1,4 +1,4 @@
-package org.hjf.log;
+package org.hjf.util;
 
 import java.io.BufferedWriter;
 import java.io.File;
@@ -10,16 +10,16 @@ import java.io.OutputStreamWriter;
  * 任务：文件写入到磁盘
  * Log 调试时 不能使用 LogUtil，避免循环建立 LogCat 写入本地文件线程任务
  */
-class FileWriterTask implements Runnable {
+public class FileWriterTask implements Runnable {
 
     private String filePath;
-    private String info;
+    protected String content;
     private boolean append = false;
 
-    FileWriterTask(String filePath, String info) {
+    public FileWriterTask(String filePath, String info) {
         super();
         this.filePath = filePath;
-        this.info = info;
+        this.content = info;
     }
 
     public void setAppendable(boolean append) {
@@ -39,7 +39,7 @@ class FileWriterTask implements Runnable {
         BufferedWriter writer = null;
         try {
             writer = new BufferedWriter(new OutputStreamWriter(new FileOutputStream(file, this.append), "UTF-8"));
-            writer.write(info);
+            writer.write(content);
             writer.newLine();
             writer.flush();
         } catch (Exception e) {
