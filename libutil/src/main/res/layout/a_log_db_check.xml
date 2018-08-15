@@ -1,36 +1,32 @@
 <?xml version="1.0" encoding="utf-8"?>
-<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
-    xmlns:app="http://schemas.android.com/apk/res-auto"
+<FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
-    android:layout_height="match_parent"
-    android:orientation="vertical">
+    android:layout_height="match_parent">
 
-    <LinearLayout
+
+    <Spinner
+        android:id="@+id/spinner"
+        android:layout_width="60dp"
+        android:layout_height="40dp"
+        tools:background="@android:color/holo_red_dark" />
+
+    <HorizontalScrollView
         android:layout_width="match_parent"
         android:layout_height="40dp"
-        tools:background="@android:color/holo_red_dark">
+        android:layout_marginStart="60dp"
+        tools:background="@android:color/holo_blue_dark">
 
-        <Spinner
-            android:id="@+id/spinner"
-            android:layout_width="60dp"
-            android:layout_height="match_parent" />
-
-        <HorizontalScrollView
-            android:layout_width="0dp"
+        <LinearLayout
+            android:id="@+id/ll_tags"
+            android:layout_width="wrap_content"
             android:layout_height="match_parent"
-            android:layout_weight="1">
-
-            <LinearLayout
-                android:id="@+id/ll_tags"
-                android:layout_width="wrap_content"
-                android:layout_height="match_parent"
-                android:orientation="horizontal" />
-        </HorizontalScrollView>
-    </LinearLayout>
+            android:orientation="horizontal" />
+    </HorizontalScrollView>
 
     <ListView
         android:id="@+id/lv_content"
         android:layout_width="match_parent"
-        android:layout_height="match_parent" />
-</LinearLayout>
+        android:layout_height="match_parent"
+        android:layout_marginTop="40dp" />
+</FrameLayout>

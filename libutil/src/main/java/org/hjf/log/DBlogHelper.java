@@ -28,6 +28,7 @@ final class DBlogHelper extends SQLiteOpenHelper {
     private static final String LOG_TABLE = "log";
     private static final String LOG_TAG_TABLE = "log_tag";
     private static final int DB_SUBMIT_TIME_INTERVAL = 2000;
+    static final int QUERY_DATA_NUM = 30;
     /**
      * submit data list runnable
      */
@@ -196,13 +197,14 @@ final class DBlogHelper extends SQLiteOpenHelper {
     }
 
     /**
-     * query TimeStamp, ClassPath, Content, Method
+     * query "TimeStamp, ClassPath, Content, Method" from table
+     * query num = 30
      *
      * @param selectedTagStrList selected tag string list
      * @return entity list
      */
     @WorkerThread
-    List<LogEntity> queryLogEntityInDB(List<String> selectedTagStrList) {
+    List<LogEntity> queryLogEntityInDB(List<String> selectedTagStrList, int offset) {
 
         StringBuilder selectionBuilder = new StringBuilder();
         for (int i = 0; i < selectedTagStrList.size(); i++) {
@@ -211,12 +213,13 @@ final class DBlogHelper extends SQLiteOpenHelper {
 
         // delete selection string last two char " or "
         selectionBuilder.setLength(selectionBuilder.length() == 0 ? 0 : selectionBuilder.length() - 4);
-
+        // or rawQuery
+        // limit 1,2;   <==>   limit 2 offset 1;
         Cursor cursor = getReadableDatabase().query(LOG_TABLE,
                 new String[]{"TimeStamp, Level, ClassPath, Method, LineNumber, Content, isMainThread"},
                 selectionBuilder.length() == 0 ? null : selectionBuilder.toString(),
                 selectionBuilder.length() == 0 ? null : selectedTagStrList.toArray(new String[]{}),
-                null, null, null);
+                null, null, "TimeStamp DESC", offset + "," + QUERY_DATA_NUM);
 
 
         List<LogEntity> logEntityList = new ArrayList<>();

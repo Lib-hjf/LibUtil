@@ -15,12 +15,14 @@ import android.view.Gravity;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.AbsListView;
 import android.widget.AdapterView;
 import android.widget.BaseAdapter;
 import android.widget.LinearLayout;
 import android.widget.ListView;
 import android.widget.Spinner;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import org.hjf.util.DateUtils;
 import org.hjf.util.R;
@@ -40,6 +42,8 @@ public final class DBLogUIActivity extends AppCompatActivity {
     private List<String> selectedTagId = new ArrayList<>();
     private SparseArray<TextView> tagViewCache = new SparseArray<>();
     private LinearLayout llTags;
+    private boolean hasMoreData = true;
+    private boolean isLoading = false;
 
     public static void start(Context context) {
         Intent intent = new Intent(context, DBLogUIActivity.class);
@@ -77,7 +81,7 @@ public final class DBLogUIActivity extends AppCompatActivity {
                     TextView tagView = getTagView(tagId, tagStr);
                     llTags.addView(tagView);
                 }
-                qryDataInDB();
+                refreshData();
             }
 
             @Override
@@ -88,6 +92,33 @@ public final class DBLogUIActivity extends AppCompatActivity {
         // list view
         ListView lvContent = findViewById(R.id.lv_content);
         lvContent.setAdapter(lvAdapter);
+        lvContent.setOnScrollListener(new AbsListView.OnScrollListener() {
+            @Override
+            public void onScrollStateChanged(AbsListView view, int scrollState) {
+                if (scrollState != SCROLL_STATE_IDLE) {
+                    return;
+                }
+                if (isLoading) {
+                    return;
+                }
+                int count = view.getCount();
+                count = count - 5 > 0 ? count - 5 : count - 1;
+                if (view.getLastVisiblePosition() <= count) {
+                    return;
+                }
+                if (!hasMoreData) {
+                    Toast.makeText(LogUtil.context, "no more data", Toast.LENGTH_SHORT).show();
+                    return;
+                }
+                Toast.makeText(LogUtil.context, "query more data", Toast.LENGTH_SHORT).show();
+                qryDataInDB();
+            }
+
+            @Override
+            public void onScroll(AbsListView view, int firstVisibleItem, int visibleItemCount, int totalItemCount) {
+
+            }
+        });
         // selected tags
         llTags = findViewById(R.id.ll_tags);
 
@@ -106,14 +137,26 @@ public final class DBLogUIActivity extends AppCompatActivity {
         }).start();
     }
 
+    private void refreshData(){
+        lvAdapter.clearData();
+        hasMoreData = true;
+        qryDataInDB();
+    }
+
     private void qryDataInDB() {
         new Thread(new Runnable() {
             @Override
             public void run() {
+                isLoading = true;
                 // 查询
-                List<LogEntity> logEntities = LogUtil.dbLogger.dblogHelper.queryLogEntityInDB(DBLogUIActivity.this.selectedTagId);
-                lvAdapter.setDatas(logEntities);
-
+                List<LogEntity> logEntities = LogUtil.dbLogger.dblogHelper.queryLogEntityInDB(DBLogUIActivity.this.selectedTagId, lvAdapter.getCount());
+                hasMoreData = logEntities.size() == DBlogHelper.QUERY_DATA_NUM;
+                if (lvAdapter.getCount() == 0) {
+                    lvAdapter.setDataList(logEntities);
+                } else {
+                    lvAdapter.addDataList(logEntities);
+                }
+                isLoading = false;
             }
         }).start();
     }
@@ -146,7 +189,7 @@ public final class DBLogUIActivity extends AppCompatActivity {
                     if (view != null) {
                         selectedTagId.remove(tagId + "");
                         llTags.removeView(view);
-                        qryDataInDB();
+                        refreshData();
                     }
                 }
             });
@@ -217,9 +260,23 @@ public final class DBLogUIActivity extends AppCompatActivity {
             this.context = context;
         }
 
-        void setDatas(@NonNull List<LogEntity> datas) {
+        void setDataList(@NonNull List<LogEntity> datas) {
             LvAdapter.this.datas.clear();
+            LvAdapter.this.addDataList(datas);
+        }
+
+        void addDataList(@NonNull List<LogEntity> datas) {
             LvAdapter.this.datas.addAll(datas);
+            ((Activity) this.context).runOnUiThread(new Runnable() {
+                @Override
+                public void run() {
+                    LvAdapter.this.notifyDataSetChanged();
+                }
+            });
+        }
+
+        void clearData() {
+            LvAdapter.this.datas.clear();
             ((Activity) this.context).runOnUiThread(new Runnable() {
                 @Override
                 public void run() {
@@ -251,13 +308,19 @@ public final class DBLogUIActivity extends AppCompatActivity {
                         .inflate(R.layout.item_log_db_ui, parent, false);
             }
 
-            LogEntity entity = LvAdapter.this.datas.get(position);
+            final LogEntity entity = LvAdapter.this.datas.get(position);
 
             TextView tvTime = convertView.findViewById(R.id.tv_log_time);
             tvTime.setText(DateUtils.getDate_HMS(LvAdapter.this.context, entity.getTimeStamp()));
 
             TextView tvTag = convertView.findViewById(R.id.tv_log_tag);
             tvTag.setText(entity.getTag());
+            tvTag.setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View v) {
+                    Toast.makeText(LogUtil.context, entity.getTag(), Toast.LENGTH_SHORT).show();
+                }
+            });
 
             TextView tvContent = convertView.findViewById(R.id.tv_log_content);
             stringBuilder.setLength(0);

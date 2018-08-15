@@ -2,8 +2,11 @@ package org.hjf.util;
 
 import android.content.Context;
 
+import java.text.ParseException;
+import java.text.SimpleDateFormat;
 import java.util.Calendar;
 import java.util.Date;
+import java.util.Locale;
 
 /**
  * 时间日期工具类
@@ -89,6 +92,31 @@ public class DateUtils {
         Calendar calendar = Calendar.getInstance();
         calendar.setTimeInMillis(timeInMillis);
         return calendar.getTime();
+    }
+
+
+    /**
+     * 获取时间戳
+     *
+     * @param strYMD 2018-02-15
+     * @return time
+     */
+    public static long getTime_YMD(String strYMD) throws ParseException {
+        SimpleDateFormat simpleDateFormat = new SimpleDateFormat("yyyy-MM-dd", Locale.CHINESE);
+        Date date = simpleDateFormat.parse(strYMD);
+        return date.getTime();
+    }
+
+    /**
+     * 获取时间戳
+     *
+     * @param strYMD 2018-02-15
+     * @return time
+     */
+    public static long getTime_YMD_HMS(String strYMD) throws ParseException {
+        SimpleDateFormat simpleDateFormat = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss", Locale.CHINESE);
+        Date date = simpleDateFormat.parse(strYMD);
+        return date.getTime();
     }
 
 }
