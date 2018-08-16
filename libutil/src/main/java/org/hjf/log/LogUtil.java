@@ -11,8 +11,6 @@ import org.json.JSONException;
 import org.json.JSONObject;
 
 import java.text.MessageFormat;
-import java.util.ArrayList;
-import java.util.List;
 
 
 /**
@@ -62,6 +60,9 @@ public final class LogUtil {
     }
 
     public static void v(String pattern, Object... arguments) {
+        if (!checkLogLevel(Log.VERBOSE)) {
+            return;
+        }
         LogUtil.messageFormat.applyPattern(pattern);
         String content = LogUtil.messageFormat.format(arguments);
         LogUtil.v(content);
@@ -88,6 +89,9 @@ public final class LogUtil {
     }
 
     public static void d(String pattern, Object... arguments) {
+        if (!checkLogLevel(Log.DEBUG)) {
+            return;
+        }
         LogUtil.messageFormat.applyPattern(pattern);
         String content = LogUtil.messageFormat.format(arguments);
         LogUtil.d(content);
@@ -103,6 +107,9 @@ public final class LogUtil {
     }
 
     public static void json(String json) {
+        if (!checkLogLevel(Log.DEBUG)) {
+            return;
+        }
         if (TextUtils.isEmpty(json)) {
             LogUtil.e("Empty/Null json content");
             return;
@@ -149,6 +156,9 @@ public final class LogUtil {
     }
 
     public static void i(String pattern, Object... arguments) {
+        if (!checkLogLevel(Log.INFO)) {
+            return;
+        }
         LogUtil.messageFormat.applyPattern(pattern);
         String content = LogUtil.messageFormat.format(arguments);
         LogUtil.i(content);
@@ -171,6 +181,9 @@ public final class LogUtil {
     }
 
     public static void w(String pattern, Object... arguments) {
+        if (!checkLogLevel(Log.WARN)) {
+            return;
+        }
         LogUtil.messageFormat.applyPattern(pattern);
         String content = LogUtil.messageFormat.format(arguments);
         LogUtil.w(content);
@@ -193,6 +206,9 @@ public final class LogUtil {
     }
 
     public static void e(String pattern, Object... arguments) {
+        if (!checkLogLevel(Log.ERROR)) {
+            return;
+        }
         LogUtil.messageFormat.applyPattern(pattern);
         String content = LogUtil.messageFormat.format(arguments);
         LogUtil.e(content);
@@ -210,12 +226,16 @@ public final class LogUtil {
         if (LogUtil.context == null) {
             throw new RuntimeException("LogUtil has not init.");
         }
-        if (LogUtil.logcat != null && LogUtil.logcat.isLog(logLevel)
-                || (LogUtil.fileLogger != null && LogUtil.fileLogger.isLog(logLevel)
-                || (LogUtil.dbLogger != null && LogUtil.dbLogger.isLog(logLevel)))) {
+        if (checkLogLevel(logLevel)) {
             return LogEntity.create(logLevel, msg);
         }
         return null;
+    }
+
+    private static boolean checkLogLevel(int logLevel) {
+        return (LogUtil.logcat != null && LogUtil.logcat.isLog(logLevel))
+                || (LogUtil.fileLogger != null && LogUtil.fileLogger.isLog(logLevel)
+                || (LogUtil.dbLogger != null && LogUtil.dbLogger.isLog(logLevel)));
     }
 
 
@@ -254,6 +274,13 @@ public final class LogUtil {
             LogUtil.logcat = new Logcat();
         }
         LogUtil.logcat.setLogLevel(logLevel);
+    }
+
+    public static void openLogcat(int logLevel, String tagName) {
+        LogUtil.openLogcat(logLevel);
+        if (!TextUtils.isEmpty(tagName)) {
+            LogUtil.logcat.setTag(tagName);
+        }
     }
 
     /**

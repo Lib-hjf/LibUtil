@@ -4,7 +4,6 @@ import android.util.Log;
 
 abstract class AbsLogger {
 
-    private static final int OTHER = 8;
     private static final int CLOSE = 9;
     /**
      * level filter

@@ -17,7 +17,7 @@ import android.util.Log;
  */
 final class Logcat extends AbsLogger {
 
-    private static final String TAG = "MyLogger";
+    private String tag = "HJFLogger";
     /*  */private static final String LINE_START = "┌────────────────────────────────────────────\n";
     /**/private static final String LINE_CONTENT = "│   ";
     /* */private static final String LINE_MIDDLE = "├┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄\n";
@@ -28,29 +28,33 @@ final class Logcat extends AbsLogger {
     Logcat() {
     }
 
+    public void setTag(String tag) {
+        this.tag = tag;
+    }
+
     @Override
     protected void onLog_VERBOSE(LogEntity logEntity) {
-        Log.v(TAG, formatContent(logEntity));
+        Log.v(tag, formatContent(logEntity));
     }
 
     @Override
     protected void onLog_Info(LogEntity logEntity) {
-        Log.i(TAG, formatContent(logEntity));
+        Log.i(tag, formatContent(logEntity));
     }
 
     @Override
     protected void onLog_Debug(LogEntity logEntity) {
-        Log.d(TAG, formatContent(logEntity));
+        Log.d(tag, formatContent(logEntity));
     }
 
     @Override
     protected void onLog_WARN(LogEntity logEntity) {
-        Log.w(TAG, formatContent(logEntity));
+        Log.w(tag, formatContent(logEntity));
     }
 
     @Override
     protected void onLog_ERROR(LogEntity logEntity) {
-        Log.e(TAG, formatContent(logEntity));
+        Log.e(tag, formatContent(logEntity));
     }
 
     /**
