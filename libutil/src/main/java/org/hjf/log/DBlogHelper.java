@@ -224,7 +224,6 @@ final class DBlogHelper extends SQLiteOpenHelper {
         if (!selectedTagStrList.isEmpty()) {
             selectionBuilder.append(")");
         }
-        String string = selectionBuilder.toString();
         // or rawQuery
         // limit 1,2;   <==>   limit 2 offset 1;
         Cursor cursor = getReadableDatabase().query(LOG_TABLE,
