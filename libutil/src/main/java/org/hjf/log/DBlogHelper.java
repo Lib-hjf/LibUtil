@@ -8,13 +8,11 @@ import android.os.Handler;
 import android.os.Looper;
 import android.os.Message;
 import android.support.annotation.WorkerThread;
-import android.text.TextUtils;
 import android.util.SparseArray;
 
 import org.hjf.util.R;
 
 import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.LinkedList;
 import java.util.List;
 
@@ -201,24 +199,38 @@ final class DBlogHelper extends SQLiteOpenHelper {
      * query num = 30
      *
      * @param selectedTagStrList selected tag string list
+     * @param logLevel           log level
+     * @param offset             query start index
      * @return entity list
      */
     @WorkerThread
-    List<LogEntity> queryLogEntityInDB(List<String> selectedTagStrList, int offset) {
+    List<LogEntity> queryLogEntityInDB(List<String> selectedTagStrList, int logLevel, int offset) {
 
         StringBuilder selectionBuilder = new StringBuilder();
+        // log level
+        selectionBuilder.append("Level >= ? and ");
+        String[] keys = new String[selectedTagStrList.size() + 1];
+        keys[0] = String.valueOf(logLevel);
+        if (!selectedTagStrList.isEmpty()) {
+            selectionBuilder.append("(");
+        }
+        // log tag id
         for (int i = 0; i < selectedTagStrList.size(); i++) {
             selectionBuilder.append("TagId = ? or ");
+            keys[i + 1] = selectedTagStrList.get(i);
         }
-
         // delete selection string last two char " or "
         selectionBuilder.setLength(selectionBuilder.length() == 0 ? 0 : selectionBuilder.length() - 4);
+        if (!selectedTagStrList.isEmpty()) {
+            selectionBuilder.append(")");
+        }
+        String string = selectionBuilder.toString();
         // or rawQuery
         // limit 1,2;   <==>   limit 2 offset 1;
         Cursor cursor = getReadableDatabase().query(LOG_TABLE,
                 new String[]{"TimeStamp, Level, ClassPath, Method, LineNumber, Content, isMainThread"},
-                selectionBuilder.length() == 0 ? null : selectionBuilder.toString(),
-                selectionBuilder.length() == 0 ? null : selectedTagStrList.toArray(new String[]{}),
+                selectionBuilder.toString(),
+                keys,
                 null, null, "TimeStamp DESC", offset + "," + QUERY_DATA_NUM);
 
 
@@ -245,7 +257,7 @@ final class DBlogHelper extends SQLiteOpenHelper {
      *
      * @return all tag string
      */
-    List<String> queryAllTagStrinDB() {
+    List<String> queryAllTagStringDB() {
 
         Cursor cursor = getReadableDatabase().query(LOG_TAG_TABLE,
                 new String[]{"TagId, TagStr"},

@@ -37,9 +37,11 @@ public final class DBLogUIActivity extends AppCompatActivity {
 
     private static final String SHOW_ALL_TAG = "ALL";
 
-    private SpAdapter spAdapter = new SpAdapter(this);
+    private SpAdapter spTagAdapter = new SpAdapter(this);
+    private SpAdapter spLevelAdapter = new SpAdapter(this);
     private LvAdapter lvAdapter = new LvAdapter(this);
     private List<String> selectedTagId = new ArrayList<>();
+    private int curLogLevel = Log.VERBOSE;
     private SparseArray<TextView> tagViewCache = new SparseArray<>();
     private LinearLayout llTags;
     private boolean hasMoreData = true;
@@ -59,13 +61,13 @@ public final class DBLogUIActivity extends AppCompatActivity {
 
     @Override
     public void onContentChanged() {
-        // spinner
-        Spinner spinner = findViewById(R.id.spinner);
-        spinner.setAdapter(spAdapter);
-        spinner.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
+        // spinner tag
+        Spinner spinnerTag = findViewById(R.id.spinner_tag);
+        spinnerTag.setAdapter(spTagAdapter);
+        spinnerTag.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
             @Override
             public void onItemSelected(AdapterView<?> parent, View view, int position, long id) {
-                String tagStr = spAdapter.datas.get(position);
+                String tagStr = spTagAdapter.datas.get(position);
                 // show all tag
                 if (SHOW_ALL_TAG.equals(tagStr)) {
                     selectedTagId.clear();
@@ -89,6 +91,39 @@ public final class DBLogUIActivity extends AppCompatActivity {
 
             }
         });
+        // spinner level
+        Spinner spinnerLevel = findViewById(R.id.spinner_level);
+        spinnerLevel.setAdapter(spLevelAdapter);
+        spinnerLevel.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
+            @Override
+            public void onItemSelected(AdapterView<?> parent, View view, int position, long id) {
+                String levelStr = spLevelAdapter.datas.get(position);
+                switch (levelStr) {
+                    case "VERBOSE":
+                        curLogLevel = Log.VERBOSE;
+                        break;
+                    case "DEBUG":
+                        curLogLevel = Log.DEBUG;
+                        break;
+                    case "INFO":
+                        curLogLevel = Log.INFO;
+                        break;
+                    case "WARN":
+                        curLogLevel = Log.WARN;
+                        break;
+                    case "ERROR":
+                        curLogLevel = Log.ERROR;
+                        break;
+                }
+                refreshData();
+            }
+
+            @Override
+            public void onNothingSelected(AdapterView<?> parent) {
+
+            }
+        });
+        spLevelAdapter.setDataList(getLevelDataList());
         // list view
         ListView lvContent = findViewById(R.id.lv_content);
         lvContent.setAdapter(lvAdapter);
@@ -130,14 +165,14 @@ public final class DBLogUIActivity extends AppCompatActivity {
         new Thread(new Runnable() {
             @Override
             public void run() {
-                List<String> tagStrList = LogUtil.dbLogger.dblogHelper.queryAllTagStrinDB();
+                List<String> tagStrList = LogUtil.dbLogger.dblogHelper.queryAllTagStringDB();
                 tagStrList.add(0, SHOW_ALL_TAG);
-                spAdapter.setDatas(tagStrList);
+                spTagAdapter.setDataList(tagStrList);
             }
         }).start();
     }
 
-    private void refreshData(){
+    private void refreshData() {
         lvAdapter.clearData();
         hasMoreData = true;
         qryDataInDB();
@@ -149,7 +184,8 @@ public final class DBLogUIActivity extends AppCompatActivity {
             public void run() {
                 isLoading = true;
                 // 查询
-                List<LogEntity> logEntities = LogUtil.dbLogger.dblogHelper.queryLogEntityInDB(DBLogUIActivity.this.selectedTagId, lvAdapter.getCount());
+                List<LogEntity> logEntities = LogUtil.dbLogger.dblogHelper
+                        .queryLogEntityInDB(DBLogUIActivity.this.selectedTagId, curLogLevel, lvAdapter.getCount());
                 hasMoreData = logEntities.size() == DBlogHelper.QUERY_DATA_NUM;
                 if (lvAdapter.getCount() == 0) {
                     lvAdapter.setDataList(logEntities);
@@ -199,6 +235,16 @@ public final class DBLogUIActivity extends AppCompatActivity {
         return textView;
     }
 
+    public List<String> getLevelDataList() {
+        List<String> levelDataList = new ArrayList<>();
+        levelDataList.add("VERBOSE");
+        levelDataList.add("DEBUG");
+        levelDataList.add("INFO");
+        levelDataList.add("WARN");
+        levelDataList.add("ERROR");
+        return levelDataList;
+    }
+
     private static class SpAdapter extends BaseAdapter {
 
         private Context context;
@@ -208,9 +254,9 @@ public final class DBLogUIActivity extends AppCompatActivity {
             this.context = context;
         }
 
-        void setDatas(@NonNull List<String> datas) {
+        void setDataList(@NonNull List<String> dataList) {
             SpAdapter.this.datas.clear();
-            SpAdapter.this.datas.addAll(datas);
+            SpAdapter.this.datas.addAll(dataList);
             ((Activity) SpAdapter.this.context).runOnUiThread(new Runnable() {
                 @Override
                 public void run() {
