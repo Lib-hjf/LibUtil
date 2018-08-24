@@ -21,7 +21,7 @@ import java.util.List;
  * support create table
  * support insertCache、delete、query
  */
-final class DBlogHelper extends SQLiteOpenHelper {
+final class DBLogHelper extends SQLiteOpenHelper {
 
     private static final String LOG_TABLE = "log";
     private static final String LOG_TAG_TABLE = "log_tag";
@@ -46,13 +46,15 @@ final class DBlogHelper extends SQLiteOpenHelper {
     private Handler submitHandler = new Handler(Looper.myLooper()) {
         @Override
         public void handleMessage(Message msg) {
-            final LinkedList<LogEntity> clone = (LinkedList<LogEntity>) logEntityCache.clone();
-            logEntityCache.clear();
-            insertDB(clone);
+            synchronized (DBLogHelper.this) {
+                final LinkedList<LogEntity> clone = (LinkedList<LogEntity>) logEntityCache.clone();
+                logEntityCache.clear();
+                insertDB(clone);
+            }
         }
     };
 
-    DBlogHelper(Context context, String name) {
+    DBLogHelper(Context context, String name) {
         super(context, name, null, 28);
     }
 
@@ -98,7 +100,7 @@ final class DBlogHelper extends SQLiteOpenHelper {
      * 此处需要线程安全，不能进行耗时操作
      * 将任务添入缓存池中，开启事务添入
      */
-    void insertCache(LogEntity entity) {
+    synchronized void insertCache(LogEntity entity) {
         logEntityCache.add(entity);
         submitHandler.removeMessages(MESSAGE_SUBMIT_DB);
         submitHandler.sendEmptyMessageDelayed(MESSAGE_SUBMIT_DB, DB_SUBMIT_TIME_INTERVAL);

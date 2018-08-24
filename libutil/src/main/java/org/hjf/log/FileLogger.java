@@ -26,9 +26,11 @@ final class FileLogger extends AbsLogger {
     private Handler submitHandler = new Handler(Looper.myLooper()) {
         @Override
         public void handleMessage(Message msg) {
-            final LinkedList<LogEntity> clone = (LinkedList<LogEntity>) logEntityCache.clone();
-            logEntityCache.clear();
-            logcat2File(mLogDiskPath, clone);
+            synchronized (FileLogger.this) {
+                final LinkedList<LogEntity> clone = (LinkedList<LogEntity>) logEntityCache.clone();
+                logEntityCache.clear();
+                logcat2File(mLogDiskPath, clone);
+            }
         }
     };
 
@@ -67,7 +69,7 @@ final class FileLogger extends AbsLogger {
      *
      * @param entity log entity
      */
-    private void logcat2FileCache(LogEntity entity) {
+    private synchronized void logcat2FileCache(LogEntity entity) {
         logEntityCache.add(entity);
         submitHandler.removeMessages(MESSAGE_SUBMIT_FILE);
         submitHandler.sendEmptyMessageDelayed(MESSAGE_SUBMIT_FILE, DB_SUBMIT_TIME_INTERVAL);

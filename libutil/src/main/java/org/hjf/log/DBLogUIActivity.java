@@ -186,7 +186,7 @@ public final class DBLogUIActivity extends AppCompatActivity {
                 // 查询
                 List<LogEntity> logEntities = LogUtil.dbLogger.dblogHelper
                         .queryLogEntityInDB(DBLogUIActivity.this.selectedTagId, curLogLevel, lvAdapter.getCount());
-                hasMoreData = logEntities.size() == DBlogHelper.QUERY_DATA_NUM;
+                hasMoreData = logEntities.size() == DBLogHelper.QUERY_DATA_NUM;
                 if (lvAdapter.getCount() == 0) {
                     lvAdapter.setDataList(logEntities);
                 } else {

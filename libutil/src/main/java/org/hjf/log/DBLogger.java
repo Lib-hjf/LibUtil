@@ -14,11 +14,11 @@ final class DBLogger extends AbsLogger {
 
     private final static int DB_FILE_SAVE_MAX_DAY_NUM = 7;
 
-    DBlogHelper dblogHelper;
+    DBLogHelper dblogHelper;
 
     DBLogger() {
         final String dbFileName = "log-" + DateUtils.getDate_YMD(LogUtil.context, System.currentTimeMillis()) + ".db";
-        this.dblogHelper = new DBlogHelper(LogUtil.context, dbFileName);
+        this.dblogHelper = new DBLogHelper(LogUtil.context, dbFileName);
         deleteObsoleteDatabase(dbFileName);
     }
 
