@@ -11,6 +11,7 @@ import org.json.JSONException;
 import org.json.JSONObject;
 
 import java.text.MessageFormat;
+import java.util.LinkedList;
 
 
 /**
@@ -25,10 +26,14 @@ public final class LogUtil {
     /**
      * logger
      */
-    private static Logcat logcat;
+    private static ConsoleLog logcat;
     private static FileLogger fileLogger;
     static DBLogger dbLogger;
     private static CrashLogger crashLogger;
+    /**
+     * class filter
+     */
+    private static LinkedList<String> classNameFilter = new LinkedList<>();
     /**
      * context
      */
@@ -68,8 +73,11 @@ public final class LogUtil {
         LogUtil.v(content);
     }
 
-    public static void d(@Nullable LogEntity logEntity) {
+    private static void d(@Nullable LogEntity logEntity) {
         if (logEntity == null) {
+            return;
+        }
+        if (!checkLogLevel(Log.DEBUG)) {
             return;
         }
         if (LogUtil.logcat != null) {
@@ -83,20 +91,6 @@ public final class LogUtil {
         }
     }
 
-    public static void d(String msg) {
-        LogEntity logEntity = getLogEntity(Log.DEBUG, msg);
-        LogUtil.d(logEntity);
-    }
-
-    public static void d(String pattern, Object... arguments) {
-        if (!checkLogLevel(Log.DEBUG)) {
-            return;
-        }
-        LogUtil.messageFormat.applyPattern(pattern);
-        String content = LogUtil.messageFormat.format(arguments);
-        LogUtil.d(content);
-    }
-
     public static void d(Object object) {
         LogEntity logEntity = getLogEntity(Log.DEBUG, null);
         if (logEntity == null) {
@@ -104,6 +98,17 @@ public final class LogUtil {
         }
         logEntity.setArgument(object);
         LogUtil.d(logEntity);
+    }
+
+    public static void d(String msg) {
+        LogEntity logEntity = getLogEntity(Log.DEBUG, msg);
+        LogUtil.d(logEntity);
+    }
+
+    public static void d(String pattern, Object... arguments) {
+        LogUtil.messageFormat.applyPattern(pattern);
+        String content = LogUtil.messageFormat.format(arguments);
+        LogUtil.d(content);
     }
 
     public static void json(String json) {
@@ -223,19 +228,27 @@ public final class LogUtil {
      */
     @Nullable
     private static LogEntity getLogEntity(int logLevel, String msg) {
+        LogEntity entity = null;
         if (LogUtil.context == null) {
             throw new RuntimeException("LogUtil has not init.");
         }
         if (checkLogLevel(logLevel)) {
-            return LogEntity.create(logLevel, msg);
+            entity = LogEntity.create(logLevel, msg);
         }
-        return null;
+        if (entity != null && checkClassFilter(entity)) {
+            return null;
+        }
+        return entity;
     }
 
     private static boolean checkLogLevel(int logLevel) {
-        return (LogUtil.logcat != null && LogUtil.logcat.isLog(logLevel))
-                || (LogUtil.fileLogger != null && LogUtil.fileLogger.isLog(logLevel)
-                || (LogUtil.dbLogger != null && LogUtil.dbLogger.isLog(logLevel)));
+        return (LogUtil.logcat != null && LogUtil.logcat.isLog(logLevel)) ||
+                (LogUtil.fileLogger != null && LogUtil.fileLogger.isLog(logLevel)) ||
+                (LogUtil.dbLogger != null && LogUtil.dbLogger.isLog(logLevel));
+    }
+
+    private static boolean checkClassFilter(@NonNull LogEntity logEntity) {
+        return classNameFilter.contains(logEntity.getClassPath());
     }
 
 
@@ -271,7 +284,7 @@ public final class LogUtil {
      */
     public static void openLogcat(int logLevel) {
         if (LogUtil.logcat == null) {
-            LogUtil.logcat = new Logcat();
+            LogUtil.logcat = new ConsoleLog();
         }
         LogUtil.logcat.setLogLevel(logLevel);
     }
@@ -309,6 +322,10 @@ public final class LogUtil {
 
     public static boolean isMainThread(long threadId) {
         return LogUtil.mainThreadId == threadId;
+    }
+
+    public static void addIgnoreClassPath(String classPath) {
+        LogUtil.classNameFilter.add(classPath);
     }
 
     /**

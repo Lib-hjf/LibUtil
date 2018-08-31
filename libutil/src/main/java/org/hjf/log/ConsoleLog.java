@@ -15,7 +15,7 @@ import android.util.Log;
  * │
  * └────────────────────────────────────────────
  */
-final class Logcat extends AbsLogger {
+final class ConsoleLog extends AbsLogger {
 
     private String tag = "HJFLogger";
     /*  */private static final String LINE_START = "┌────────────────────────────────────────────\n";
@@ -25,7 +25,7 @@ final class Logcat extends AbsLogger {
 
     private StringBuilder stringBuilder = new StringBuilder();
 
-    Logcat() {
+    ConsoleLog() {
     }
 
     public void setTag(String tag) {
@@ -34,27 +34,27 @@ final class Logcat extends AbsLogger {
 
     @Override
     protected void onLog_VERBOSE(LogEntity logEntity) {
-        Log.v(tag, formatContent(logEntity));
+        Log.println(Log.VERBOSE, tag, formatContent(logEntity));
     }
 
     @Override
     protected void onLog_Info(LogEntity logEntity) {
-        Log.i(tag, formatContent(logEntity));
+        Log.println(Log.INFO, tag, formatContent(logEntity));
     }
 
     @Override
     protected void onLog_Debug(LogEntity logEntity) {
-        Log.d(tag, formatContent(logEntity));
+        Log.println(Log.DEBUG, tag, formatContent(logEntity));
     }
 
     @Override
     protected void onLog_WARN(LogEntity logEntity) {
-        Log.w(tag, formatContent(logEntity));
+        Log.println(Log.WARN, tag, formatContent(logEntity));
     }
 
     @Override
     protected void onLog_ERROR(LogEntity logEntity) {
-        Log.e(tag, formatContent(logEntity));
+        Log.println(Log.ERROR, tag, formatContent(logEntity));
     }
 
     /**
@@ -66,15 +66,11 @@ final class Logcat extends AbsLogger {
         stringBuilder.append(LINE_START);
         // list、array、map、json ...
         if (!logEntity.hasArgument()) {
-            // {\n "json": "json"\n}
-            // thread info
-            if (logEntity.isMainThread()) {
-                stringBuilder.append(LINE_CONTENT).append("Thread: main").append("\n");
-                stringBuilder.append(LINE_MIDDLE);
-            }
-            // method info
-            stringBuilder.append(LINE_CONTENT).append(logEntity.getClassPath()).append("#")
-                    .append(logEntity.getMethodName()).append("\n");
+            // thread & method info  -->  "UI Thread, com.hjf.MainActivity.onCreate(MainActivity.java:35)\n"
+            stringBuilder.append(LINE_CONTENT);
+            stringBuilder.append(logEntity.isMainThread() ? "UI" : "BG").append(" Thread, ");
+            stringBuilder.append(logEntity.getClassPath()).append(".").append(logEntity.getMethodName()).append("(");
+            stringBuilder.append(logEntity.getClassNames()[0]).append(".java:").append(logEntity.getLineNumber()).append(")").append("\n");
             stringBuilder.append(LINE_MIDDLE);
         }
         // content

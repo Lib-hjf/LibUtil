@@ -52,6 +52,10 @@ final class LogEntity {
         return classNames[0];
     }
 
+    public String[] getClassNames() {
+        return classNames;
+    }
+
     /**
      * handle inner class and "className$1"
      * such as: Class$Adapter$1
