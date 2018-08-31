@@ -6,10 +6,6 @@ import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.OutputStreamWriter;
 
-/**
- * 任务：文件写入到磁盘
- * Log 调试时 不能使用 LogUtil，避免循环建立 LogCat 写入本地文件线程任务
- */
 public class FileWriterTask implements Runnable {
 
     private String filePath;

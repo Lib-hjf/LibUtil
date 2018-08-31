@@ -3,7 +3,7 @@ package org.hjf.util;
 import android.content.Context;
 import android.os.Environment;
 
-class DirectoryUtils {
+final class DirectoryUtils {
 
     public static void getEnvironmentDirectories() {
         //:/system
