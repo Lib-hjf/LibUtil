@@ -5,7 +5,7 @@ import android.support.v4.util.LruCache;
 import android.support.v4.util.SimpleArrayMap;
 
 
-final class CacheMemoryUtils {
+public final class CacheMemoryUtils {
     private static final int DEFAULT_MAX_COUNT = 256;
 
     private static final SimpleArrayMap<String, CacheMemoryUtils> CACHE_MAP = new SimpleArrayMap<>();

@@ -12,7 +12,6 @@ import android.os.Parcelable;
 import android.support.annotation.NonNull;
 import android.support.v4.util.SimpleArrayMap;
 
-
 import org.json.JSONArray;
 import org.json.JSONObject;
 
@@ -40,9 +39,10 @@ import java.util.concurrent.atomic.AtomicLong;
 /**
  * TODO 修改文件目录便于阅读
  * TODO 最大数量不作为缓存文件名
- * TODO 外部不可见Disk、Cache等Util工具
+ * TODO 改成 Config 形式配置
+ * TODO 磁盘读写需要在后台进行，考虑 FileStream 开启，关闭损耗资源可选择延迟读写
  */
-final class CacheDiskUtils {
+public final class CacheDiskUtils {
     private static final long DEFAULT_MAX_SIZE = Long.MAX_VALUE;
     private static final int DEFAULT_MAX_COUNT = Integer.MAX_VALUE;
 
@@ -68,23 +68,25 @@ final class CacheDiskUtils {
      * <p>cache size: unlimited</p>
      * <p>cache count: unlimited</p>
      *
+     * @param cacheDir  The cache folder name of cache.
      * @param cacheName The name of cache.
      * @return the single {@link CacheDiskUtils} instance
      */
-    public static CacheDiskUtils getInstance(final String cacheName) {
-        return getInstance(cacheName, DEFAULT_MAX_SIZE, DEFAULT_MAX_COUNT);
+    public static CacheDiskUtils getInstance(final String cacheDir, final String cacheName) {
+        return getInstance(cacheDir, cacheName, DEFAULT_MAX_SIZE, DEFAULT_MAX_COUNT);
     }
 
     /**
      * Return the single {@link CacheDiskUtils} instance.
      * <p>cache directory: /data/data/package/cache/cacheUtils</p>
      *
+     * @param cacheDir The cache folder name of cache.
      * @param maxSize  The max size of cache, in bytes.
      * @param maxCount The max count of cache.
      * @return the single {@link CacheDiskUtils} instance
      */
-    public static CacheDiskUtils getInstance(final long maxSize, final int maxCount) {
-        return getInstance("", maxSize, maxCount);
+    public static CacheDiskUtils getInstance(String cacheDir, final long maxSize, final int maxCount) {
+        return getInstance(cacheDir, "", maxSize, maxCount);
     }
 
     /**

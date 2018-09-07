@@ -80,27 +80,20 @@ public class NetworkUtils {
         return null;
     }
 
-    public static boolean isNetworkAvailable(Context paramContext) {
+    public static boolean isNetConnected(Context paramContext) {
         ConnectivityManager localConnectivityManager = (ConnectivityManager) paramContext.getSystemService("connectivity");
-        if (localConnectivityManager == null) {
-            return false;
-        }
-
-        NetworkInfo[] arrayOfNetworkInfo = localConnectivityManager
-                .getAllNetworkInfo();
-        if (arrayOfNetworkInfo == null) {
-            return false;
-        }
-
-        for (int i = 0; i < arrayOfNetworkInfo.length; i++) {
-
-            if ((!arrayOfNetworkInfo[i].isAvailable()) || (!arrayOfNetworkInfo[i].isConnected()))
-                continue;
-
-            return true;
+        if (localConnectivityManager != null) {
+            NetworkInfo[] arrayOfNetworkInfo = localConnectivityManager.getAllNetworkInfo();
+            if (arrayOfNetworkInfo != null) {
+                for (NetworkInfo anArrayOfNetworkInfo : arrayOfNetworkInfo) {
+                    if ((!anArrayOfNetworkInfo.isAvailable()) || (!anArrayOfNetworkInfo.isConnected())) {
+                        continue;
+                    }
+                    return true;
+                }
+            }
         }
         return false;
-
     }
 
     /**
