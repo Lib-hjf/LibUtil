@@ -18,8 +18,9 @@ public final class ScreenUtils {
 
     /**
      * 获取状态栏高度
+     * 避免受到修改 density 后的影响，这里使用 Resources.getSystem() 获取直接获取系统的资源
      */
-    private static int getStatusHeight(Context context) {
+    private static int getStatusHeight(final Context context) {
         Resources resources = Resources.getSystem();
         int resourceId = resources.getIdentifier("status_bar_height", "dimen", "android");
         return resources.getDimensionPixelSize(resourceId);

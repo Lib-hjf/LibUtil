@@ -18,7 +18,8 @@ import android.util.DisplayMetrics;
  * 1. px = density * dp;
  * 2. density = dpi / 160;
  * 3. px = dp * (dpi / 160);
- * 4. dpi = √￣(height^2 + width^2) / ScreenWidthSize(inch)
+ * 4. dpi = √￣(height^2 + width^2) / ScreenSize(inch)
+ * 5. px = dp * ((√￣(height^2 + width^2) / ScreenSize(inch)) / 160);
  * <p>
  * <p>
  * For example:
@@ -69,6 +70,9 @@ public final class ScreenAdapterUtils {
     }
 
     /**
+     * 宽度为例子：
+     * px 设备真实宽度
+     * dp 设计图标准宽度
      * 1. px = density * dp;
      * 2. density = dpi / 160;
      * 3. px = dp * (dpi / 160);
